@@ -18,7 +18,7 @@ import {
   Box,
   Rating,
 } from '@mui/material';
-import { ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
+import { Visibility as VisibilityIcon } from '@mui/icons-material';
 
 const bikes = [
   {
@@ -171,21 +171,15 @@ const Products = () => {
                   </Typography>
                 )}
               </CardContent>
-              <CardActions className="justify-between p-4">
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => handleProductClick(bike.id)}
-                >
-                  Voir les détails
-                </Button>
+              <CardActions className="p-4">
                 <Button
                   variant="contained"
                   color="primary"
-                  startIcon={<ShoppingCartIcon />}
+                  fullWidth
                   onClick={() => handleProductClick(bike.id)}
+                  startIcon={<VisibilityIcon />}
                 >
-                  Acheter
+                  Voir le produit
                 </Button>
               </CardActions>
             </Card>

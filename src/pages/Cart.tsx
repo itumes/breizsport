@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -10,69 +11,35 @@ import {
   IconButton,
   Box,
   Divider,
-  TextField,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Remove as RemoveIcon,
   Delete as DeleteIcon,
+  ShoppingBasket as ShoppingBasketIcon,
 } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
-
-// Simulation d'articles dans le panier
-const initialCartItems = [
-  {
-    id: 1,
-    name: 'VTT Explorer Pro',
-    price: 899,
-    image: 'https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: 'Vélo de Route Carbone',
-    price: 1299,
-    image: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    quantity: 1,
-  },
-];
+import { useCart } from '../context/CartContext';
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const { state, removeFromCart, updateQuantity } = useCart();
+  const navigate = useNavigate();
 
-  const updateQuantity = (id: number, change: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems(items => items.filter(item => item.id !== id));
-  };
-
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  if (cartItems.length === 0) {
+  if (state.items.length === 0) {
     return (
       <Container className="py-16">
-        <Typography variant="h5" className="text-center mb-8">
-          Votre panier est vide
-        </Typography>
-        <div className="text-center">
+        <Box className="text-center">
+          <ShoppingBasketIcon sx={{ fontSize: 60, color: 'text.secondary' }} />
+          <Typography variant="h5" className="mt-4 mb-8">
+            Votre panier est vide
+          </Typography>
           <Button
-            component={Link}
-            to="/products"
             variant="contained"
             color="primary"
-            size="large"
+            onClick={() => navigate('/products')}
           >
             Découvrir nos vélos
           </Button>
-        </div>
+        </Box>
       </Container>
     );
   }
@@ -86,8 +53,8 @@ const Cart = () => {
       <Grid container spacing={4}>
         {/* Liste des articles */}
         <Grid item xs={12} md={8}>
-          {cartItems.map((item) => (
-            <Card key={item.id} className="mb-4">
+          {state.items.map((item, index) => (
+            <Card key={index} className="mb-4">
               <Grid container>
                 <Grid item xs={4}>
                   <CardMedia
@@ -111,21 +78,21 @@ const Cart = () => {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center">
                         <IconButton
-                          onClick={() => updateQuantity(item.id, -1)}
+                          onClick={() => updateQuantity(index, item.quantity - 1)}
                           size="small"
                         >
                           <RemoveIcon />
                         </IconButton>
                         <Typography className="mx-3">{item.quantity}</Typography>
                         <IconButton
-                          onClick={() => updateQuantity(item.id, 1)}
+                          onClick={() => updateQuantity(index, item.quantity + 1)}
                           size="small"
                         >
                           <AddIcon />
                         </IconButton>
                       </div>
                       <IconButton
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeFromCart(index)}
                         color="error"
                         size="small"
                       >
@@ -148,8 +115,8 @@ const Cart = () => {
               </Typography>
               
               <div className="space-y-4">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between">
+                {state.items.map((item, index) => (
+                  <div key={index} className="flex justify-between">
                     <Typography>
                       {item.name} (x{item.quantity})
                     </Typography>
@@ -164,16 +131,9 @@ const Cart = () => {
                 <div className="flex justify-between">
                   <Typography variant="h6">Total</Typography>
                   <Typography variant="h6" color="primary">
-                    {total} €
+                    {state.totalAmount} €
                   </Typography>
                 </div>
-
-                <TextField
-                  fullWidth
-                  label="Code promo"
-                  variant="outlined"
-                  className="mt-4"
-                />
 
                 <Button
                   variant="contained"
@@ -183,6 +143,17 @@ const Cart = () => {
                   className="mt-4"
                 >
                   Procéder au paiement
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  fullWidth
+                  className="mt-2"
+                  onClick={() => navigate('/products')}
+                >
+                  Continuer mes achats
                 </Button>
               </div>
             </CardContent>

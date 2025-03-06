@@ -15,6 +15,10 @@ import {
   Snackbar,
   Alert,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   LocalShipping,
@@ -22,6 +26,7 @@ import {
   Update,
   Add as AddIcon,
   Remove as RemoveIcon,
+  ShoppingCart as ShoppingCartIcon,
 } from '@mui/icons-material';
 import { useCart } from '../context/CartContext';
 
@@ -49,7 +54,128 @@ const bikes = [
     rating: 4.5,
     stock: 5,
   },
-  // ... autres vélos
+  {
+    id: 2,
+    name: 'Vélo de Route Velocity',
+    price: 1299,
+    category: 'Route',
+    image: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    description: 'Vélo de route performant pour les passionnés de vitesse',
+    specs: {
+      cadre: 'Carbone T700',
+      fourche: 'Carbone monocoque',
+      transmission: 'Shimano 105 11 vitesses',
+      freins: 'Freins à disque hydrauliques',
+      pneus: '700c route',
+    },
+    rating: 4.8,
+    stock: 3,
+  },
+  {
+    id: 3,
+    name: 'E-Bike City Plus',
+    price: 1899,
+    category: 'Électrique',
+    image: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    description: 'Vélo électrique urbain avec une excellente autonomie',
+    specs: {
+      cadre: 'Aluminium hydroformé',
+      moteur: 'Bosch Performance Line 250W',
+      batterie: '500Wh amovible',
+      transmission: 'Shimano Nexus 7 vitesses',
+      freins: 'Freins à disque hydrauliques',
+      autonomie: 'Jusqu\'à 100km',
+    },
+    rating: 4.6,
+    stock: 8,
+  },
+  {
+    id: 4,
+    name: 'BMX Freestyle X',
+    price: 499,
+    category: 'BMX',
+    image: 'https://images.unsplash.com/photo-1583267746897-2cf415887172?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    description: 'BMX robuste pour les tricks et le freestyle',
+    specs: {
+      cadre: 'Acier chromoly',
+      fourche: 'Chromoly',
+      transmission: 'Mono-vitesse',
+      freins: 'U-Brake arrière',
+      pneus: '20 pouces',
+    },
+    rating: 4.3,
+    stock: 6,
+  },
+  {
+    id: 5,
+    name: 'Gravel Adventure Pro',
+    price: 1599,
+    category: 'Gravel',
+    image: 'https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    description: 'Vélo polyvalent pour routes et chemins',
+    specs: {
+      cadre: 'Aluminium 6061 double butted',
+      fourche: 'Carbone tout-terrain',
+      transmission: 'SRAM Rival 1x11 vitesses',
+      freins: 'Freins à disque hydrauliques',
+      pneus: '700c Gravel',
+    },
+    rating: 4.7,
+    stock: 4,
+  },
+  {
+    id: 6,
+    name: 'Vélo Enfant Junior',
+    price: 299,
+    category: 'Enfant',
+    image: 'https://images.unsplash.com/photo-1595432541891-a461100d3054?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    description: 'Vélo adapté aux enfants de 6 à 10 ans',
+    specs: {
+      cadre: 'Aluminium léger',
+      fourche: 'Rigide acier',
+      transmission: '6 vitesses',
+      freins: 'V-Brake',
+      pneus: '24 pouces',
+    },
+    rating: 4.4,
+    stock: 10,
+  },
+  {
+    id: 7,
+    name: 'VTT Électrique Enduro',
+    price: 3499,
+    category: 'VTT Électrique',
+    image: 'https://images.unsplash.com/photo-1593764592116-bfb2a97c642a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    description: 'VTT électrique haut de gamme pour l\'enduro',
+    specs: {
+      cadre: 'Aluminium premium',
+      moteur: 'Shimano EP8 250W',
+      batterie: '630Wh intégrée',
+      suspension: 'Double suspension 160mm',
+      transmission: 'Shimano XT 12 vitesses',
+      freins: 'Freins à disque hydrauliques 4 pistons',
+    },
+    rating: 4.9,
+    stock: 2,
+  },
+  {
+    id: 8,
+    name: 'Vélo Pliant City',
+    price: 699,
+    category: 'Pliant',
+    image: 'https://images.unsplash.com/photo-1582516702958-6f0040505f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    description: 'Vélo pliant compact pour les déplacements urbains',
+    specs: {
+      cadre: 'Aluminium pliable',
+      pliage: 'Système rapide',
+      transmission: 'Shimano 7 vitesses',
+      freins: 'V-Brake',
+      pneus: '20 pouces',
+      poids: '12kg',
+    },
+    rating: 4.2,
+    stock: 7,
+  }
 ];
 
 function TabPanel(props: TabPanelProps) {
@@ -77,6 +203,7 @@ const ProductDetail = () => {
   const [tabValue, setTabValue] = useState(0);
   const [showNotification, setShowNotification] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
@@ -92,22 +219,34 @@ const ProductDetail = () => {
     );
   }
 
+  const handleQuantityChange = (change: number) => {
+    const newQuantity = Math.max(1, Math.min(bike.stock, quantity + change));
+    setQuantity(newQuantity);
+  };
+
   const handleAddToCart = () => {
     addToCart({
       id: bike.id,
       name: bike.name,
       price: bike.price,
       image: bike.image,
+      quantity: quantity,
     });
     setShowNotification(true);
-    setTimeout(() => {
-      navigate('/cart');
-    }, 1500);
+    setShowConfirmDialog(true);
   };
 
-  const handleQuantityChange = (change: number) => {
-    const newQuantity = Math.max(1, Math.min(bike.stock, quantity + change));
-    setQuantity(newQuantity);
+  const handleCloseDialog = () => {
+    setShowConfirmDialog(false);
+  };
+
+  const handleGoToCart = () => {
+    navigate('/cart');
+  };
+
+  const handleContinueShopping = () => {
+    setShowConfirmDialog(false);
+    navigate('/products');
   };
 
   return (
@@ -198,6 +337,7 @@ const ProductDetail = () => {
             fullWidth
             onClick={handleAddToCart}
             disabled={bike.stock === 0}
+            startIcon={<ShoppingCartIcon />}
           >
             {bike.stock > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
           </Button>
@@ -248,15 +388,40 @@ const ProductDetail = () => {
         </TabPanel>
       </Box>
 
+      {/* Notification */}
       <Snackbar
         open={showNotification}
-        autoHideDuration={1500}
+        autoHideDuration={3000}
         onClose={() => setShowNotification(false)}
       >
         <Alert severity="success" sx={{ width: '100%' }}>
           Produit ajouté au panier avec succès !
         </Alert>
       </Snackbar>
+
+      {/* Dialog de confirmation */}
+      <Dialog
+        open={showConfirmDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Produit ajouté au panier
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Que souhaitez-vous faire ?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleContinueShopping} color="primary">
+            Continuer mes achats
+          </Button>
+          <Button onClick={handleGoToCart} color="primary" variant="contained" autoFocus>
+            Voir mon panier
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
