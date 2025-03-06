@@ -14,8 +14,8 @@ import {
   Drawer,
   List,
   ListItem,
-  ListItemText,
   ListItemIcon,
+  ListItemText,
   Divider,
   ListItemButton,
 } from '@mui/material';
@@ -27,8 +27,10 @@ import {
   Info as InfoIcon,
   ContactMail as ContactIcon,
   Close as CloseIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const navigationLinks = [
   { name: 'Accueil', path: '/', icon: <HomeIcon /> },
@@ -39,13 +41,28 @@ const navigationLinks = [
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const location = useLocation();
   const { state: cartState } = useCart();
+  const { user, logout } = useAuth();
 
   const cartItemsCount = cartState.items.reduce((total, item) => total + item.quantity, 0);
 
   const handleMobileMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleProfileMenuClose();
   };
 
   const isActiveRoute = (path: string) => {
@@ -86,7 +103,7 @@ const Navbar = () => {
             ))}
           </Box>
 
-          {/* Panier et Menu Mobile */}
+          {/* Panier, Profil et Menu Mobile */}
           <Box className="flex items-center">
             <IconButton
               component={Link}
@@ -98,6 +115,38 @@ const Navbar = () => {
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
+
+            {user ? (
+              <>
+                <IconButton
+                  color="inherit"
+                  onClick={handleProfileMenuOpen}
+                  className="text-primary-main ml-2"
+                >
+                  <PersonIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleProfileMenuClose}
+                >
+                  <MenuItem disabled>
+                    {user.prenom} {user.nom}
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout}>Se déconnecter</MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Button
+                component={Link}
+                to="/login"
+                color="inherit"
+                className="text-primary-main ml-2"
+                startIcon={<PersonIcon />}
+              >
+                Connexion
+              </Button>
+            )}
 
             <IconButton
               color="inherit"
