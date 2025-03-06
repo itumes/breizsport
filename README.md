@@ -1,46 +1,143 @@
-# Getting Started with Create React App
+# BreizSport - Application de Vente de Vélos
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Application web moderne de vente de vélos développée avec React, TypeScript, Material-UI et TailwindCSS.
 
-## Available Scripts
+## 🚀 Démarrage Rapide avec Docker
 
-In the project directory, you can run:
+### Prérequis
+- Docker
+- Docker Compose
 
-### `npm start`
+### Installation et Démarrage
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Cloner le projet :
+```bash
+git clone https://github.com/votre-username/breizsport.git
+cd breizsport
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+2. Lancer l'application avec Docker Compose :
+```bash
+docker-compose up -d
+```
 
-### `npm test`
+L'application sera accessible à l'adresse : http://localhost:3000
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Arrêt de l'Application
+```bash
+docker-compose down
+```
 
-### `npm run build`
+## 🛠 Développement Local
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prérequis
+- Node.js (v16 ou supérieur)
+- npm ou yarn
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Installer les dépendances :
+```bash
+npm install
+```
 
-### `npm run eject`
+2. Lancer le serveur de développement :
+```bash
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 📦 Structure du Projet
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+breizsport/
+├── src/
+│   ├── components/     # Composants réutilisables
+│   ├── context/       # Contextes React (panier, etc.)
+│   ├── pages/         # Pages de l'application
+│   └── ...
+├── public/           # Fichiers statiques
+├── Dockerfile        # Configuration Docker
+├── docker-compose.yml # Configuration Docker Compose
+├── nginx.conf        # Configuration Nginx
+└── ...
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 🔧 Configuration Docker
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Le projet utilise une configuration Docker en deux étapes :
 
-## Learn More
+1. **Stage de Build** :
+   - Utilise node:18-alpine
+   - Installe les dépendances
+   - Construit l'application
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. **Stage de Production** :
+   - Utilise nginx:alpine
+   - Sert l'application buildée
+   - Inclut une configuration Nginx optimisée
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Personnalisation
+
+- Le port par défaut est 3000 (modifiable dans docker-compose.yml)
+- La configuration Nginx peut être modifiée dans nginx.conf
+- Les variables d'environnement peuvent être ajoutées dans docker-compose.yml
+
+## 🔄 Intégration dans d'Autres Projets
+
+Pour intégrer BreizSport dans un autre projet :
+
+1. Copier les fichiers Docker :
+```bash
+cp Dockerfile docker-compose.yml nginx.conf /chemin/vers/votre/projet/
+```
+
+2. Adapter le docker-compose.yml selon vos besoins :
+```yaml
+version: '3.8'
+services:
+  votre-projet:
+    # Votre configuration existante
+  breizsport:
+    build:
+      context: ./breizsport
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    networks:
+      - votre-network
+```
+
+## 📝 Variables d'Environnement
+
+Pour personnaliser l'application, vous pouvez définir les variables d'environnement suivantes :
+
+```env
+REACT_APP_API_URL=votre_api_url
+REACT_APP_STRIPE_KEY=votre_cle_stripe
+```
+
+## 🔒 Sécurité
+
+- Les fichiers statiques sont mis en cache
+- Compression gzip activée
+- Headers de sécurité configurés dans Nginx
+
+## 📈 Performance
+
+La configuration Nginx inclut :
+- Compression gzip pour les fichiers statiques
+- Mise en cache optimisée
+- Support du routage React
+- Headers de cache appropriés
+
+## 🤝 Contribution
+
+1. Forker le projet
+2. Créer une branche (`git checkout -b feature/AmazingFeature`)
+3. Commiter vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Pusher vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrir une Pull Request
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
